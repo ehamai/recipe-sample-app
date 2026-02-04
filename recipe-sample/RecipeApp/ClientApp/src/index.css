@@ -1,3 +1,56 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Custom theme extensions for Tailwind v4 */
+@theme {
+  --color-brand-50: #ecfdf5;
+  --color-brand-100: #d1fae5;
+  --color-brand-200: #a7f3d0;
+  --color-brand-300: #6ee7b7;
+  --color-brand-400: #34d399;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
+  --color-brand-800: #065f46;
+  --color-brand-900: #064e3b;
+  
+  --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 24px -8px rgba(0, 0, 0, 0.12), 0 12px 32px -12px rgba(0, 0, 0, 0.12);
+  
+  --max-width-content: 900px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom card hover effect */
+.recipe-card {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.recipe-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Skill level badge styles - using CSS custom properties for Tailwind v4 */
+.skill-beginner {
+  background-color: #d1fae5; /* emerald-100 */
+  color: #047857; /* emerald-700 */
+}
+
+.skill-intermediate {
+  background-color: #fef3c7; /* amber-100 */
+  color: #b45309; /* amber-700 */
+}
+
+.skill-advanced {
+  background-color: #fee2e2; /* red-100 */
+  color: #b91c1c; /* red-700 */
+}
+
+/* Subtle background pattern */
+.bg-pattern {
+  background-color: #f9fafb;
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 20px 20px;
+}

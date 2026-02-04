@@ -57,10 +57,13 @@ public class RecipesController : ControllerBase
         {
             r.Id,
             r.Title,
+            r.Description,
+            r.SkillLevel,
+            r.CookTimeMinutes,
             Ingredients = JsonSerializer.Deserialize<List<string>>(r.IngredientsJson),
             Instructions = r.Instructions.Split('\n', StringSplitOptions.RemoveEmptyEntries).ToList(),
-            SuggestedAdditions = r.SuggestedAdditionsJson != null 
-                ? JsonSerializer.Deserialize<List<string>>(r.SuggestedAdditionsJson) 
+            SuggestedAdditions = r.SuggestedAdditionsJson != null
+                ? JsonSerializer.Deserialize<List<string>>(r.SuggestedAdditionsJson)
                 : new List<string>(),
             r.CreatedAt
         }).ToList();
@@ -82,6 +85,9 @@ public class RecipesController : ControllerBase
         {
             UserId = userId,
             Title = recipe.Title,
+            Description = recipe.Description,
+            SkillLevel = recipe.SkillLevel,
+            CookTimeMinutes = recipe.CookTimeMinutes,
             IngredientsJson = JsonSerializer.Serialize(recipe.Ingredients),
             Instructions = string.Join("\n", recipe.Instructions),
             SuggestedAdditionsJson = JsonSerializer.Serialize(recipe.SuggestedAdditions),

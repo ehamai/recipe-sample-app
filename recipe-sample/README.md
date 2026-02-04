@@ -50,7 +50,7 @@ cp .env.example .env
 
 Edit `.env` with your GitHub OAuth App credentials:
 - Go to GitHub > Settings > Developer Settings > OAuth Apps > New OAuth App
-- Set Authorization callback URL to: `http://localhost:5000/api/auth/callback`
+- Set Authorization callback URL to: `http://localhost:5123/api/auth/callback`
 
 Update `RecipeApp/appsettings.Development.json`:
 ```json
@@ -111,7 +111,7 @@ cd ..
 dotnet run --configuration Release
 ```
 
-Open http://localhost:5000
+Open http://localhost:5123
 
 ## API Endpoints
 

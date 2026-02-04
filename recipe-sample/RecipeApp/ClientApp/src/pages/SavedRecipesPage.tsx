@@ -1,25 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { RecipeCard } from '../components/RecipeCard';
 import { ShoppingList } from '../components/ShoppingList';
 import type { SavedRecipe, Recipe } from '../types';
+import {
+  Button,
+  Spinner,
+  Title1,
+  Body1,
+  Card,
+} from '@fluentui/react-components';
+import { PersonAccounts24Regular, BookOpen24Regular } from '@fluentui/react-icons';
 
-export function SavedRecipesPage() {
+export const SavedRecipesPage = () => {
   const { user, login } = useAuth();
   const [recipes, setRecipes] = useState<SavedRecipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [shoppingList, setShoppingList] = useState<{ name: string; isRecommended: boolean }[] | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      fetchSavedRecipes();
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
-
-  const fetchSavedRecipes = async () => {
+  const fetchSavedRecipes = useCallback(async () => {
     try {
       const response = await axios.get('/api/recipes/saved');
       setRecipes(response.data);
@@ -28,18 +28,26 @@ export function SavedRecipesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const deleteRecipe = async (id: number) => {
+  useEffect(() => {
+    if (user) {
+      fetchSavedRecipes();
+    } else {
+      setLoading(false);
+    }
+  }, [user, fetchSavedRecipes]);
+
+  const deleteRecipe = useCallback(async (id: number) => {
     try {
       await axios.delete(`/api/recipes/saved/${id}`);
       setRecipes(prev => prev.filter(r => r.id !== id));
     } catch (error) {
       console.error('Failed to delete recipe:', error);
     }
-  };
+  }, []);
 
-  const createShoppingList = async (recipe: Recipe) => {
+  const createShoppingList = useCallback(async (recipe: Recipe) => {
     try {
       const response = await axios.post('/api/shopping-list', {
         ingredientsOnHand: [],
@@ -50,40 +58,73 @@ export function SavedRecipesPage() {
     } catch (err) {
       console.error('Failed to create shopping list:', err);
     }
-  };
+  }, []);
+
+  const closeShoppingList = useCallback(() => {
+    setShoppingList(null);
+  }, []);
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Saved Recipes</h2>
-        <p className="text-gray-600 mb-6">Please log in to view your saved recipes.</p>
-        <button
-          onClick={login}
-          className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-        >
-          Login with GitHub
-        </button>
+      <div className="py-16 px-4">
+        <div className="text-center">
+          <div className="inline-block mb-4">
+            <span className="text-5xl">📚</span>
+          </div>
+          <Title1 className="mb-4 block">Saved Recipes</Title1>
+          <Body1 className="mb-6 block text-gray-600 max-w-md mx-auto">
+            Log in to view and manage your collection of saved recipes.
+          </Body1>
+          <Button
+            appearance="primary"
+            icon={<PersonAccounts24Regular />}
+            onClick={login}
+            size="large"
+            style={{ borderRadius: '12px', padding: '12px 32px' }}
+          >
+            Login with GitHub
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Saved Recipes</h2>
-      
-      {loading ? (
-        <div className="text-center py-8">Loading...</div>
-      ) : recipes.length === 0 ? (
-        <div className="text-center py-8 text-gray-600">
-          You haven't saved any recipes yet. Generate some recipes and save your favorites!
+    <div className="py-8 px-4">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="inline-block mb-4">
+          <span className="text-5xl">📚</span>
         </div>
+        <Title1 className="mb-3 block">Your Saved Recipes</Title1>
+        <Body1 className="text-gray-600">
+          Your personal collection of favorite recipes
+        </Body1>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-16">
+          <Spinner size="large" label="Loading recipes..." />
+        </div>
+      ) : recipes.length === 0 ? (
+        <Card className="py-16 text-center shadow-card" style={{ borderRadius: '16px' }}>
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+            <BookOpen24Regular className="text-gray-400" />
+          </div>
+          <Body1 className="text-gray-500">
+            You haven't saved any recipes yet. Generate some recipes and save your favorites!
+          </Body1>
+        </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {recipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}
               recipe={{
                 title: recipe.title,
+                description: recipe.description,
+                skillLevel: recipe.skillLevel,
+                cookTimeMinutes: recipe.cookTimeMinutes,
                 ingredients: recipe.ingredients,
                 instructions: recipe.instructions,
                 suggestedAdditions: recipe.suggestedAdditions
@@ -99,9 +140,9 @@ export function SavedRecipesPage() {
       {shoppingList && (
         <ShoppingList
           items={shoppingList}
-          onClose={() => setShoppingList(null)}
+          onClose={closeShoppingList}
         />
       )}
     </div>
   );
-}
+};

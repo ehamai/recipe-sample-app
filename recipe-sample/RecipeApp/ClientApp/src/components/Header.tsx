@@ -1,40 +1,67 @@
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../App';
+import {
+  Avatar,
+  Button,
+  Spinner,
+  Tooltip,
+} from '@fluentui/react-components';
+import {
+  WeatherMoon24Regular,
+  WeatherSunny24Regular,
+  PersonAccounts24Regular,
+} from '@fluentui/react-icons';
 
-export function Header() {
+export const Header = () => {
   const { user, loading, login, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
-    <header className="bg-emerald-600 text-white shadow-lg">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">🍳 Recipe Generator</h1>
-        <div>
+    <header className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-lg">
+      <div className="max-w-content mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🍳</span>
+          <h1 className="text-xl font-semibold tracking-tight">Recipe Generator</h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <Tooltip content={isDark ? 'Switch to light mode' : 'Switch to dark mode'} relationship="label">
+            <Button
+              appearance="subtle"
+              icon={isDark ? <WeatherSunny24Regular /> : <WeatherMoon24Regular />}
+              onClick={toggleTheme}
+              style={{ color: 'white' }}
+            />
+          </Tooltip>
           {loading ? (
-            <span className="text-emerald-200">Loading...</span>
+            <Spinner size="small" />
           ) : user ? (
-            <div className="flex items-center gap-4">
-              <img
-                src={user.avatarUrl}
-                alt={user.name}
-                className="w-8 h-8 rounded-full"
+            <div className="flex items-center gap-3">
+              <Avatar
+                image={{ src: user.avatarUrl }}
+                name={user.name || user.login}
+                size={32}
               />
-              <span>{user.name || user.login}</span>
-              <button
+              <span className="hidden sm:inline font-medium">{user.name || user.login}</span>
+              <Button 
+                appearance="secondary" 
                 onClick={logout}
-                className="bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded"
+                style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: 'white', border: 'none' }}
               >
                 Logout
-              </button>
+              </Button>
             </div>
           ) : (
-            <button
+            <Button
+              appearance="primary"
+              icon={<PersonAccounts24Regular />}
               onClick={login}
-              className="bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded font-semibold"
+              style={{ backgroundColor: 'white', color: '#059669' }}
             >
               Login with GitHub
-            </button>
+            </Button>
           )}
         </div>
       </div>
     </header>
   );
-}
+};

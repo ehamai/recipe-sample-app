@@ -10,11 +10,18 @@ namespace RecipeApp.Controllers;
 public class AuthController : ControllerBase
 {
     [HttpGet("login")]
-    public IActionResult Login([FromQuery] string? returnUrl = "/")
+    public IActionResult Login([FromQuery] string? returnUrl = null)
     {
+        // In development, redirect back to the Vite dev server
+        var redirectUri = returnUrl ?? (
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" 
+                ? "http://localhost:5173" 
+                : "/"
+        );
+        
         var properties = new AuthenticationProperties
         {
-            RedirectUri = returnUrl
+            RedirectUri = redirectUri
         };
         return Challenge(properties, "GitHub");
     }

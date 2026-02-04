@@ -1,5 +1,21 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import {
+  SearchBox,
+  TabList,
+  Tab,
+  Checkbox,
+  Button,
+  Input,
+  InteractionTag,
+  InteractionTagPrimary,
+  TagGroup,
+  Caption1,
+  Subtitle2,
+  Card,
+  CardHeader,
+} from '@fluentui/react-components';
+import { Add24Regular } from '@fluentui/react-icons';
 
 interface Props {
   selectedIngredients: string[];
@@ -50,111 +66,102 @@ export function IngredientSelector({ selectedIngredients, onSelectionChange }: P
   const categories = Object.keys(ingredientsByCategory);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">Select Your Ingredients</h2>
-      
-      {/* Search */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search ingredients..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-        />
-        {searchTerm && filteredIngredients.length > 0 && (
-          <div className="mt-2 border rounded-lg max-h-40 overflow-y-auto">
-            {filteredIngredients.map(ing => (
-              <button
+    <Card className="h-full" style={{ borderRadius: '16px' }}>
+      <CardHeader
+        header={<Subtitle2>Select Your Ingredients</Subtitle2>}
+      />
+      <div className="p-4 flex flex-col gap-4">
+        {/* Search */}
+        <div className="relative">
+          <SearchBox
+            placeholder="Search ingredients..."
+            value={searchTerm}
+            onChange={(_, data) => setSearchTerm(data.value)}
+            className="w-full"
+          />
+          {searchTerm && filteredIngredients.length > 0 && (
+            <Card className="absolute z-10 w-full mt-1 max-h-40 overflow-y-auto" style={{ borderRadius: '12px' }}>
+              {filteredIngredients.map(ing => (
+                <div
+                  key={ing.id}
+                  onClick={() => { toggleIngredient(ing.name); setSearchTerm(''); }}
+                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+                >
+                  <Checkbox checked={selectedIngredients.includes(ing.name)} />
+                  {ing.name}
+                </div>
+              ))}
+            </Card>
+          )}
+        </div>
+
+        {/* Category Tabs */}
+        <TabList
+          selectedValue={activeCategory || ''}
+          onTabSelect={(_, data) => setActiveCategory(data.value as string)}
+          size="small"
+        >
+          {categories.map(cat => (
+            <Tab key={cat} value={cat}>
+              {cat}
+            </Tab>
+          ))}
+        </TabList>
+
+        {/* Ingredient Grid */}
+        {activeCategory && ingredientsByCategory[activeCategory] && (
+          <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
+            {ingredientsByCategory[activeCategory].map(ing => (
+              <Checkbox
                 key={ing.id}
-                onClick={() => { toggleIngredient(ing.name); setSearchTerm(''); }}
-                className={`w-full text-left px-4 py-2 hover:bg-emerald-50 ${
-                  selectedIngredients.includes(ing.name) ? 'bg-emerald-100' : ''
-                }`}
-              >
-                {ing.name}
-              </button>
+                checked={selectedIngredients.includes(ing.name)}
+                onChange={() => toggleIngredient(ing.name)}
+                label={ing.name}
+              />
             ))}
           </div>
         )}
-      </div>
 
-      {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {categories.map(cat => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`px-3 py-1 rounded-full text-sm ${
-              activeCategory === cat
-                ? 'bg-emerald-600 text-white'
-                : 'bg-gray-200 hover:bg-gray-300'
-            }`}
+        {/* Custom Ingredient */}
+        <div className="flex gap-2">
+          <Input
+            placeholder="Add custom ingredient..."
+            value={customIngredient}
+            onChange={(_, data) => setCustomIngredient(data.value)}
+            onKeyDown={(e) => e.key === 'Enter' && addCustomIngredient()}
+            className="flex-1"
+          />
+          <Button
+            appearance="primary"
+            icon={<Add24Regular />}
+            onClick={addCustomIngredient}
           >
-            {cat}
-          </button>
-        ))}
-      </div>
+            Add
+          </Button>
+        </div>
 
-      {/* Ingredient Grid */}
-      {activeCategory && ingredientsByCategory[activeCategory] && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4">
-          {ingredientsByCategory[activeCategory].map(ing => (
-            <button
-              key={ing.id}
-              onClick={() => toggleIngredient(ing.name)}
-              className={`px-3 py-2 rounded-lg text-sm transition ${
-                selectedIngredients.includes(ing.name)
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-gray-100 hover:bg-gray-200'
-              }`}
+        {/* Selected Ingredients */}
+        {selectedIngredients.length > 0 && (
+          <div>
+            <Caption1 className="mb-2 block">Selected ({selectedIngredients.length}):</Caption1>
+            <TagGroup
+              onDismiss={(_, data) => toggleIngredient(data.value)}
+              className="flex flex-wrap gap-1"
             >
-              {ing.name}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Custom Ingredient */}
-      <div className="flex gap-2 mb-4">
-        <input
-          type="text"
-          placeholder="Add custom ingredient..."
-          value={customIngredient}
-          onChange={(e) => setCustomIngredient(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && addCustomIngredient()}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
-        />
-        <button
-          onClick={addCustomIngredient}
-          className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-        >
-          Add
-        </button>
-      </div>
-
-      {/* Selected Ingredients */}
-      {selectedIngredients.length > 0 && (
-        <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Selected ({selectedIngredients.length}):</h3>
-          <div className="flex flex-wrap gap-2">
-            {selectedIngredients.map(ing => (
-              <span
-                key={ing}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm"
-              >
-                {ing}
-                <button
-                  onClick={() => toggleIngredient(ing)}
-                  className="hover:text-emerald-600"
+              {selectedIngredients.map(ing => (
+                <InteractionTag
+                  key={ing}
+                  shape="circular"
+                  appearance="brand"
+                  value={ing}
                 >
-                  ×
-                </button>
-              </span>
-            ))}
+                  <InteractionTagPrimary hasSecondaryAction>{ing}</InteractionTagPrimary>
+                </InteractionTag>
+              ))}
+            </TagGroup>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </Card>
   );
 }

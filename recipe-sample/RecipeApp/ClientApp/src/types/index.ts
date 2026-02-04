@@ -6,6 +6,9 @@ export interface Ingredient {
 
 export interface Recipe {
   title: string;
+  description: string;
+  skillLevel: 'Beginner' | 'Intermediate' | 'Advanced';
+  cookTimeMinutes: number;
   ingredients: string[];
   instructions: string[];
   suggestedAdditions: string[];
@@ -14,6 +17,9 @@ export interface Recipe {
 export interface SavedRecipe {
   id: number;
   title: string;
+  description: string;
+  skillLevel: 'Beginner' | 'Intermediate' | 'Advanced';
+  cookTimeMinutes: number;
   ingredients: string[];
   instructions: string[];
   suggestedAdditions: string[];
