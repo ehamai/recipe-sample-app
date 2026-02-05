@@ -104,14 +104,18 @@ Open http://localhost:5173
 Build and run as a single application:
 
 ```bash
+# Build the frontend
 cd RecipeApp/ClientApp
 npm run build
 
+# Run the backend (serves the built frontend)
 cd ..
-dotnet run --configuration Release
+dotnet run --configuration Release --launch-profile http
 ```
 
 Open http://localhost:5123
+
+> **Note:** The `--launch-profile http` uses your development credentials from `appsettings.Development.json`. For a true production deployment, use `--launch-profile production` and configure credentials in `appsettings.json`.
 
 ## API Endpoints
 

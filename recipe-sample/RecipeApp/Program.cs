@@ -106,7 +106,9 @@ if (app.Environment.IsDevelopment())
     app.UseCors("DevelopmentPolicy");
 }
 
-app.UseHttpsRedirection();
+// Serve SPA static files (works in all environments when wwwroot has content)
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 // Add authentication and authorization middleware
 app.UseAuthentication();
@@ -115,14 +117,19 @@ app.UseAuthorization();
 // Map controllers
 app.MapControllers();
 
-// Serve SPA static files in production
-if (!app.Environment.IsDevelopment())
+// Fallback to index.html for SPA routing
+app.MapFallback(async context =>
 {
-    app.UseDefaultFiles();
-    app.UseStaticFiles();
-    
-    // Fallback to index.html for SPA routing
-    app.MapFallbackToFile("index.html");
-}
+    var indexPath = Path.Combine(app.Environment.WebRootPath, "index.html");
+    if (File.Exists(indexPath))
+    {
+        context.Response.ContentType = "text/html";
+        await context.Response.SendFileAsync(indexPath);
+    }
+    else
+    {
+        context.Response.StatusCode = 404;
+    }
+});
 
 app.Run();
