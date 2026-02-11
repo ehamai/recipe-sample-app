@@ -1,11 +1,11 @@
 # Recipe Generator
 
-A demo website that helps users generate AI-powered recipes based on ingredients they have on hand. Built with React, .NET 8, and the GitHub Copilot SDK.
+A demo website that helps users generate AI-powered recipes based on ingredients they have on hand. Built with React, TypeScript, and the GitHub Copilot API.
 
 ## Features
 
 - 🥗 **Ingredient Selection** - Browse ingredients by category or search for specific items
-- 🤖 **AI Recipe Generation** - Get 3 recipe suggestions using GitHub Copilot
+- 🤖 **AI Recipe Generation** - Get 8 recipe suggestions using GitHub Copilot
 - 💡 **Smart Recommendations** - Each recipe includes suggestions to enhance the dish
 - 🛒 **Shopping List** - Generate and print shopping lists for missing ingredients
 - 💾 **Save Favorites** - Bookmark recipes to cook later
@@ -14,19 +14,17 @@ A demo website that helps users generate AI-powered recipes based on ingredients
 ## Tech Stack
 
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS
-- **Backend**: .NET 8, ASP.NET Core
-- **Database**: PostgreSQL (via Docker)
-- **AI**: GitHub Copilot SDK
-- **Auth**: GitHub OAuth
+- **Backend**: Node.js, Express, TypeScript (or .NET 8)
+- **Database**: In-memory (demo mode)
+- **AI**: GitHub Copilot API
+- **Auth**: GitHub OAuth via Passport.js
 
 ## Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [Node.js 18+](https://nodejs.org/)
-- [Docker](https://www.docker.com/) (for PostgreSQL)
 - GitHub OAuth App credentials
 
-## Setup
+## Quick Start (Node.js Backend)
 
 ### 1. Clone and navigate to the project
 
@@ -34,88 +32,56 @@ A demo website that helps users generate AI-powered recipes based on ingredients
 cd recipe-sample
 ```
 
-### 2. Start PostgreSQL
+### 2. Configure GitHub OAuth
+
+Create a GitHub OAuth App:
+- Go to GitHub > Settings > Developer Settings > OAuth Apps > New OAuth App
+- Set Authorization callback URL to: `http://localhost:3000/api/auth/callback`
+
+Create the server environment file:
 
 ```bash
-docker-compose up -d
-```
-
-### 3. Configure environment
-
-Copy the example environment file and add your GitHub OAuth credentials:
-
-```bash
+cd RecipeApp/server
 cp .env.example .env
 ```
 
-Edit `.env` with your GitHub OAuth App credentials:
-- Go to GitHub > Settings > Developer Settings > OAuth Apps > New OAuth App
-- Set Authorization callback URL to: `http://localhost:5123/api/auth/callback`
-
-Update `RecipeApp/appsettings.Development.json`:
-```json
-{
-  "GitHub": {
-    "ClientId": "your_client_id",
-    "ClientSecret": "your_client_secret"
-  }
-}
+Edit `.env` with your credentials:
+```
+GITHUB_CLIENT_ID=your_client_id
+GITHUB_CLIENT_SECRET=your_client_secret
+SESSION_SECRET=any_random_string_here
 ```
 
-### 4. Run database migrations
+### 3. Install dependencies
 
 ```bash
-cd RecipeApp
-dotnet ef migrations add InitialCreate
-dotnet ef database update
-```
+cd RecipeApp/server
+npm install
 
-> Note: If you don't have EF tools, install with: `dotnet tool install --global dotnet-ef`
-
-### 5. Install frontend dependencies
-
-```bash
-cd ClientApp
+cd ../ClientApp
 npm install
 ```
 
-## Running the Application
+### 4. Run the application (Development)
 
-### Development Mode (recommended)
-
-Run frontend and backend separately for hot reloading:
-
-**Terminal 1 - Backend:**
 ```bash
-cd RecipeApp
-dotnet run
-```
-
-**Terminal 2 - Frontend:**
-```bash
-cd RecipeApp/ClientApp
+cd RecipeApp/server
 npm run dev
 ```
 
+This starts both the backend (port 3000) and frontend (port 5173) with hot reloading.
+
 Open http://localhost:5173
 
-### Production Mode
-
-Build and run as a single application:
+## Production Build
 
 ```bash
-# Build the frontend
-cd RecipeApp/ClientApp
-npm run build
-
-# Run the backend (serves the built frontend)
-cd ..
-dotnet run --configuration Release --launch-profile http
+cd RecipeApp/server
+npm run build                    # Builds client + server
+NODE_ENV=production npm start    # Serves everything on port 3000
 ```
 
-Open http://localhost:5123
-
-> **Note:** The `--launch-profile http` uses your development credentials from `appsettings.Development.json`. For a true production deployment, use `--launch-profile production` and configure credentials in `appsettings.json`.
+Open http://localhost:3000
 
 ## API Endpoints
 
@@ -135,21 +101,25 @@ Open http://localhost:5123
 
 ```
 recipe-sample/
-├── RecipeApp/                  # .NET Backend
-│   ├── Controllers/            # API Controllers
-│   ├── Services/               # Business Logic
-│   ├── Models/                 # Data Models
-│   ├── Data/                   # EF Core DbContext
+├── RecipeApp/
+│   ├── server/                 # Node.js/Express Backend
+│   │   ├── src/
+│   │   │   ├── routes/         # API route handlers
+│   │   │   ├── services/       # Business logic (Copilot API)
+│   │   │   ├── models/         # TypeScript interfaces
+│   │   │   ├── middleware/     # Auth middleware
+│   │   │   ├── data/           # In-memory data store
+│   │   │   └── app.ts          # Express app entry point
+│   │   ├── package.json
+│   │   └── tsconfig.json
 │   ├── ClientApp/              # React Frontend
 │   │   ├── src/
 │   │   │   ├── components/     # Reusable UI components
 │   │   │   ├── pages/          # Page components
 │   │   │   ├── context/        # React Context providers
-│   │   │   ├── hooks/          # Custom hooks
 │   │   │   └── types/          # TypeScript types
 │   │   └── ...
-│   └── Program.cs              # App configuration
-├── docker-compose.yml          # PostgreSQL container
+│   └── ...                     # Legacy .NET backend (optional)
 └── README.md
 ```
 
