@@ -1,0 +1,6 @@
+platform: nodejs
+nodejs_version: 18
+working_directory: server
+pre_build_command: "npm --prefix ../ClientApp install"
+run_build_command: true
+start_command: "NODE_ENV=production npm start"
