@@ -41,7 +41,7 @@ Create a GitHub OAuth App:
 Create the server environment file:
 
 ```bash
-cd RecipeApp/server
+cd server
 cp .env.example .env
 ```
 
@@ -55,7 +55,7 @@ SESSION_SECRET=any_random_string_here
 ### 3. Install dependencies
 
 ```bash
-cd RecipeApp/server
+cd server
 npm install
 
 cd ../ClientApp
@@ -65,7 +65,7 @@ npm install
 ### 4. Run the application (Development)
 
 ```bash
-cd RecipeApp/server
+cd server
 npm run dev
 ```
 
@@ -76,7 +76,7 @@ Open http://localhost:5173
 ## Production Build
 
 ```bash
-cd RecipeApp/server
+cd server
 npm run build                    # Builds client + server
 NODE_ENV=production npm start    # Serves everything on port 3000
 ```
@@ -101,24 +101,24 @@ Open http://localhost:3000
 
 ```
 recipe-sample/
-├── RecipeApp/
-│   ├── server/                 # Node.js/Express Backend
-│   │   ├── src/
-│   │   │   ├── routes/         # API route handlers
-│   │   │   ├── services/       # Business logic (Copilot API)
-│   │   │   ├── models/         # TypeScript interfaces
-│   │   │   ├── middleware/     # Auth middleware
-│   │   │   ├── data/           # In-memory data store
-│   │   │   └── app.ts          # Express app entry point
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   ├── ClientApp/              # React Frontend
-│   │   ├── src/
-│   │   │   ├── components/     # Reusable UI components
-│   │   │   ├── pages/          # Page components
-│   │   │   ├── context/        # React Context providers
-│   │   │   └── types/          # TypeScript types
-│   │   └── ...
+├── server/                     # Node.js/Express Backend
+│   ├── src/
+│   │   ├── routes/             # API route handlers
+│   │   ├── services/           # Business logic (Copilot API)
+│   │   ├── models/             # TypeScript interfaces
+│   │   ├── middleware/         # Auth middleware
+│   │   ├── data/               # In-memory data store
+│   │   └── app.ts              # Express app entry point
+│   ├── package.json
+│   └── tsconfig.json
+├── ClientApp/                  # React Frontend
+│   ├── src/
+│   │   ├── components/         # Reusable UI components
+│   │   ├── pages/              # Page components
+│   │   ├── context/            # React Context providers
+│   │   └── types/              # TypeScript types
+│   └── ...
+├── wwwroot/                    # Built frontend assets
 └── README.md
 ```
 
