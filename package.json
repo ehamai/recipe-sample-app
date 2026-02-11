@@ -1,0 +1,20 @@
+{
+  "name": "recipe-sample-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Recipe Generator - AI-powered recipe suggestions",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "cd server && npm run dev",
+    "dev:server": "cd server && npm run dev:server",
+    "dev:client": "cd ClientApp && npm run dev",
+    "install:all": "cd ClientApp && npm install && cd ../server && npm install",
+    "build": "cd server && npm run build",
+    "build:client": "cd server && npm run build:client",
+    "build:server": "cd server && npm run build:server",
+    "start": "cd server && NODE_ENV=production npm start",
+    "postinstall": "npm run install:all"
+  }
+}

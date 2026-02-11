@@ -1,6 +1,0 @@
-platform: nodejs
-platformVersion: "24"
-buildCommand: cd server && npm run build
-run:
-  port: 3000
-  startCommand: NODE_ENV=production npm start
