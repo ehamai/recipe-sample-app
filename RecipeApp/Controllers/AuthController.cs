@@ -12,12 +12,8 @@ public class AuthController : ControllerBase
     [HttpGet("login")]
     public IActionResult Login([FromQuery] string? returnUrl = null)
     {
-        // In development, redirect back to the Vite dev server
-        var redirectUri = returnUrl ?? (
-            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" 
-                ? "http://localhost:5173" 
-                : "/"
-        );
+        // Always redirect to the ASP.NET backend (serves built frontend)
+        var redirectUri = returnUrl ?? "/";
         
         var properties = new AuthenticationProperties
         {

@@ -13,11 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add Entity Framework Core with PostgreSQL
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? "Server=localhost;Port=5432;Database=recipeapp;User Id=postgres;Password=password;";
+// Add Entity Framework Core with InMemory database (for demo purposes)
+// Commented out PostgreSQL configuration:
+// var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+//     ?? "Server=localhost;Port=5432;Database=recipeapp;User Id=postgres;Password=password;";
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseNpgsql(connectionString));
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseInMemoryDatabase("RecipeAppDb"));
 
 // Add HTTP client and recipe generation service
 builder.Services.AddHttpClient();
@@ -91,11 +94,17 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Apply pending migrations on startup
+// Seed the in-memory database on startup
+// Commented out PostgreSQL migration:
+// using (var scope = app.Services.CreateScope())
+// {
+//     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//     db.Database.Migrate();
+// }
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    db.Database.EnsureCreated(); // Triggers OnModelCreating seed data for InMemory
 }
 
 // Configure the HTTP request pipeline
