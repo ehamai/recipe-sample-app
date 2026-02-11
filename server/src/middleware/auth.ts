@@ -1,6 +1,7 @@
 import passport from 'passport';
 import { Strategy as GitHubStrategy, Profile } from 'passport-github2';
 import { Request, Response, NextFunction } from 'express';
+import { getCredentials, isConfigured } from '../data/credentials.js';
 
 // User type stored in session
 export interface User {
@@ -34,19 +35,19 @@ declare module 'express-session' {
 
 // Configure Passport GitHub OAuth Strategy
 export function configurePassport(): void {
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+  const credentials = getCredentials();
   const callbackURL = process.env.GITHUB_CALLBACK_URL || 'http://localhost:3000/api/auth/callback';
 
-  if (!clientId || !clientSecret) {
-    console.warn('Warning: GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET not set');
+  if (!isConfigured()) {
+    console.warn('Warning: GitHub OAuth credentials not configured. Visit the app to set them up.');
+    return; // Don't configure passport without credentials
   }
 
   passport.use(
     new GitHubStrategy(
       {
-        clientID: clientId || '',
-        clientSecret: clientSecret || '',
+        clientID: credentials.clientId || '',
+        clientSecret: credentials.clientSecret || '',
         callbackURL: callbackURL,
       },
       (
@@ -77,6 +78,19 @@ export function configurePassport(): void {
   passport.deserializeUser((user, done) => {
     done(null, user as Express.User);
   });
+}
+
+// Reconfigure Passport after credentials are set at runtime
+export function reconfigurePassport(): void {
+  // Unregister existing strategy if any
+  try {
+    passport.unuse('github');
+  } catch {
+    // Strategy may not exist yet
+  }
+  
+  // Configure with new credentials
+  configurePassport();
 }
 
 // Middleware to check if user is authenticated

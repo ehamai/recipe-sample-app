@@ -73,10 +73,10 @@ export const HomePage = () => {
     <div className="py-8 px-4">
       {/* Hero Section */}
       <div className="text-center mb-8">
-        <div className="inline-block mb-4">
-          <span className="text-5xl">🍳</span>
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <span className="text-4xl">🍳</span>
+          <Title1>What's in your kitchen?</Title1>
         </div>
-        <Title1 className="mb-3 block">What's in your kitchen?</Title1>
         <Body1 className="text-gray-600 max-w-md mx-auto">
           Select the ingredients you have on hand, and we'll suggest delicious recipes you can make!
         </Body1>

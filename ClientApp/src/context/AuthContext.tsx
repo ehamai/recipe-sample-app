@@ -5,6 +5,7 @@ import type { User } from '../types';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isConfigured: boolean;
   login: () => void;
   logout: () => Promise<void>;
 }
@@ -14,17 +15,37 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isConfigured, setIsConfigured] = useState(true); // Assume configured until we check
 
   useEffect(() => {
-    checkAuth();
+    checkConfigAndAuth();
   }, []);
 
-  const checkAuth = async () => {
+  const checkConfigAndAuth = async () => {
     try {
-      const response = await axios.get('/api/auth/user');
-      setUser(response.data);
+      // First check if OAuth is configured
+      const configResponse = await axios.get('/api/config/status');
+      const configured = configResponse.data.configured;
+      setIsConfigured(configured);
+
+      // Only check auth if configured
+      if (configured) {
+        try {
+          const response = await axios.get('/api/auth/user');
+          setUser(response.data);
+        } catch {
+          setUser(null);
+        }
+      }
     } catch {
-      setUser(null);
+      // If config check fails, assume configured and try auth
+      setIsConfigured(true);
+      try {
+        const response = await axios.get('/api/auth/user');
+        setUser(response.data);
+      } catch {
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -40,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, isConfigured, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

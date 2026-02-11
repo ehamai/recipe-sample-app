@@ -6,12 +6,15 @@ import {
   webDarkTheme,
   TabList,
   Tab,
+  Spinner,
 } from '@fluentui/react-components';
 import type { Theme } from '@fluentui/react-components';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/Header';
 import { HomePage } from './pages/HomePage';
 import { SavedRecipesPage } from './pages/SavedRecipesPage';
+import { ConfigPage } from './pages/ConfigPage';
+import { LoginPage } from './pages/LoginPage';
 
 // Custom theme with very rounded corners (16px)
 const roundedLightTheme: Theme = {
@@ -70,6 +73,27 @@ function Navigation() {
 }
 
 function AppContent() {
+  const { user, loading, isConfigured } = useAuth();
+
+  // Show loading spinner while checking config/auth status
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-pattern flex items-center justify-center">
+        <Spinner size="large" label="Loading..." />
+      </div>
+    );
+  }
+
+  // Show config page if OAuth is not configured
+  if (!isConfigured) {
+    return <ConfigPage />;
+  }
+
+  // Show login page if not authenticated
+  if (!user) {
+    return <LoginPage />;
+  }
+
   return (
     <div className="min-h-screen bg-pattern">
       <Header />

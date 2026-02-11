@@ -1,19 +1,20 @@
+// Load environment variables FIRST, before any other imports that depend on them
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { configurePassport } from './middleware/auth.js';
 import authRoutes from './routes/auth.js';
+import configRoutes from './routes/config.js';
 import ingredientsRoutes from './routes/ingredients.js';
 import recipesRoutes from './routes/recipes.js';
 import shoppingListRoutes from './routes/shoppingList.js';
-
-// Load environment variables
-dotenv.config();
 
 // Configure Passport before using it
 configurePassport();
@@ -53,6 +54,7 @@ app.use(passport.session());
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/config', configRoutes);
 app.use('/api/ingredients', ingredientsRoutes);
 app.use('/api/recipes', recipesRoutes);
 app.use('/api/shopping-list', shoppingListRoutes);
