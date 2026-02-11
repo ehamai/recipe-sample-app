@@ -14,7 +14,7 @@ A demo website that helps users generate AI-powered recipes based on ingredients
 ## Tech Stack
 
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS
-- **Backend**: Node.js, Express, TypeScript (or .NET 8)
+- **Backend**: Node.js, Express, TypeScript
 - **Database**: In-memory (demo mode)
 - **AI**: GitHub Copilot API
 - **Auth**: GitHub OAuth via Passport.js
@@ -119,7 +119,6 @@ recipe-sample/
 │   │   │   ├── context/        # React Context providers
 │   │   │   └── types/          # TypeScript types
 │   │   └── ...
-│   └── ...                     # Legacy .NET backend (optional)
 └── README.md
 ```
 
