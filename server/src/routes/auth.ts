@@ -1,8 +1,22 @@
 import { Router, Request, Response } from 'express';
-import passport from 'passport';
+import passport, { AuthenticateOptions } from 'passport';
 import { User } from '../middleware/auth.js';
 
 const router = Router();
+
+// Extend AuthenticateOptions to include callbackURL (supported by passport-github2)
+interface GitHubAuthenticateOptions extends AuthenticateOptions {
+  callbackURL?: string;
+  scope?: string[];
+}
+
+// Helper to get the base URL from the request
+function getBaseUrl(req: Request): string {
+  // Use X-Forwarded headers if behind a proxy (common in production)
+  const protocol = req.get('X-Forwarded-Proto') || req.protocol;
+  const host = req.get('X-Forwarded-Host') || req.get('Host');
+  return `${protocol}://${host}`;
+}
 
 // GET /api/auth/login - Initiate GitHub OAuth flow
 router.get('/login', (req: Request, res: Response, next) => {
@@ -11,15 +25,29 @@ router.get('/login', (req: Request, res: Response, next) => {
   // Store return URL in session for redirect after auth
   req.session.returnUrl = returnUrl;
   
-  passport.authenticate('github', {
+  // Dynamically determine callback URL from the request
+  const callbackURL = `${getBaseUrl(req)}/api/auth/callback`;
+  
+  const options: GitHubAuthenticateOptions = {
     scope: ['user:email'],
-  })(req, res, next);
+    callbackURL: callbackURL,
+  };
+  
+  passport.authenticate('github', options)(req, res, next);
 });
 
 // GET /api/auth/callback - GitHub OAuth callback
 router.get(
   '/callback',
-  passport.authenticate('github', { failureRedirect: '/login?error=auth_failed' }),
+  (req: Request, res: Response, next) => {
+    // Use the same dynamic callback URL for consistency
+    const callbackURL = `${getBaseUrl(req)}/api/auth/callback`;
+    const options: GitHubAuthenticateOptions = {
+      failureRedirect: '/login?error=auth_failed',
+      callbackURL: callbackURL,
+    };
+    passport.authenticate('github', options)(req, res, next);
+  },
   (req: Request, res: Response) => {
     // Store user in session
     if (req.user) {
