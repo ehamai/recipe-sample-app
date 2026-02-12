@@ -28,6 +28,11 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 
+// Trust proxy in production (required for secure cookies behind reverse proxy)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // CORS - only needed in development (production serves from same origin)
 if (process.env.NODE_ENV !== 'production') {
   app.use(cors({
