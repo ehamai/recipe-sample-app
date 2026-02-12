@@ -4,7 +4,7 @@
   "private": true,
   "description": "Recipe Generator - AI-powered recipe suggestions",
   "engines": {
-    "node": "20.x"
+    "node": "24.13.0"
   },
   "scripts": {
     "dev": "cd server && npm run dev",
